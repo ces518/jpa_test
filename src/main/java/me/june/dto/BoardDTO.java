@@ -2,6 +2,8 @@ package me.june.dto;
 
 import lombok.*;
 
+import javax.validation.constraints.NotEmpty;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -9,9 +11,13 @@ import lombok.*;
 @Builder
 public class BoardDTO {
 
+    private int page = 0;
+
     private Long id = 0L;
 
-    private String title = "";
+    @NotEmpty
+    private String title;
 
-    private String content = "";
+    @NotEmpty
+    private String content;
 }
