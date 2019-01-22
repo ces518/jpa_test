@@ -8,22 +8,41 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {JpaPagingTestApplication.class})
+@SpringBootTest(classes = {JpaPagingTestApplication.class},webEnvironment = RANDOM_PORT)
 public class BoardServiceTest {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+
     @Autowired
     private BoardService boardService;
+
+    //web 통합테스트
+    @Autowired
+    private TestRestTemplate testRestTemplate;
+
+    @Test
+    public void test1(){
+        System.out.println(testRestTemplate.getForObject("/board",String.class));
+    }
+
 
     @Test
     public void list(){
@@ -37,23 +56,27 @@ public class BoardServiceTest {
         BoardDTO boardDTO = BoardDTO.builder().content("내용").title("제목")
                         .build();
         Board saveBoard = boardService.createBoard(boardDTO);
-//        List<Board> list = boardService.findAll(boardDTO);
-//        logger.info("list size = {}",list.size());
-//        assertThat(list.size(),is(1));
+
+        PageRequest pageRequest = new PageRequest(0,10,Sort.Direction.DESC,"seq");
+
+        Page<Board> list = boardService.findAll(boardDTO,pageRequest);
+        logger.info("list size = {}",list.getTotalElements());
+
+        logger.info("createdAt = {} , updatedAt = {}",saveBoard.getCreatedAt(),saveBoard.getUpdatedAt());
     }
 
-    @Test
-    public void findBoardsByTitle(){
-        BoardDTO boardDTO = BoardDTO.builder().title("제목").build();
-
-        List<Board> list = boardService.findBoardsByTitle(boardDTO);
-        logger.info("list size = {}",list.size());
-        assertThat(list.size(),is(1));
-    }
+//    @Test
+//    public void findBoardsByTitle(){
+//        BoardDTO boardDTO = BoardDTO.builder().title("제목").build();
+//        PageRequest pageRequest = new PageRequest(0,10, Sort.Direction.DESC,"seq");
+//            Page<Board> list = boardService.findBoardsByTitle(boardDTO,pageRequest);
+//        logger.info("list size = {}",list.getContent().size());
+//        assertThat(list.getContent().size(),is(1));
+//    }
 
     @Test
     public void updateBoard(){
-        BoardDTO boardDTO = BoardDTO.builder().id(1L).title("제목수정").build();
+        BoardDTO boardDTO = BoardDTO.builder().id(8L).title("제목수정").build();
         Board board = boardService.updateBoard(boardDTO);
         logger.info("update title = {}",board.getTitle());
         assertThat(board.getTitle(),is("제목수정"));
@@ -61,5 +84,7 @@ public class BoardServiceTest {
         Board updatedBoard = boardService.findOne(boardDTO);
         logger.info("updated title = {}",updatedBoard.getTitle());
         assertThat(updatedBoard.getTitle(),is("제목수정"));
+
+        logger.info("updatedAt = {}",updatedBoard.getUpdatedAt());
     }
 }
