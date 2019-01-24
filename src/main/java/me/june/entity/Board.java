@@ -14,8 +14,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 // JPA 캐시전략
 //@org.hibernate.annotations.Cache(region = "board")
 // 등록일 수정일 자동등록
@@ -44,4 +42,10 @@ public class Board {
     //수정일
     @LastModifiedDate
     private LocalDate updatedAt;
+
+    @Builder
+    public Board(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }

@@ -8,17 +8,12 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -53,8 +48,7 @@ public class BoardServiceTest {
 
     @Test
     public void save(){
-        BoardDTO boardDTO = BoardDTO.builder().content("내용").title("제목")
-                        .build();
+        BoardDTO boardDTO = BoardDTO.builder().content("내용").title("제목").build();
         Board saveBoard = boardService.createBoard(boardDTO);
 
         PageRequest pageRequest = new PageRequest(0,10,Sort.Direction.DESC,"seq");
